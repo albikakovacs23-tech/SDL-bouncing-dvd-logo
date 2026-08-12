@@ -9,16 +9,25 @@ int main() {
     time_t t;
     SDL_Init(SDL_INIT_VIDEO);
 
+    SDL_Surface *surface = SDL_LoadBMP("dvd-logo.bmp");
+
+    int logo_width = surface->w;
+    int logo_heght = surface->h;
+
+    int window_width = 800;
+    int window_heght = 600;
+
     SDL_Window *window = SDL_CreateWindow(   //this is gonna creat a window
         "DVD",
-        800, 600,
+        window_width, 
+        window_heght,
         0
     );
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
 
-    SDL_Surface *surface = SDL_LoadBMP("dvd-logo.bmp");
-
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_DestroySurface(surface);
     if (surface == NULL) {
         SDL_Log("Failed to load image: %s", SDL_GetError());
         SDL_DestroyRenderer(renderer);
@@ -27,8 +36,6 @@ int main() {
         return 1;
     }
 
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_DestroySurface(surface);
 
     if (texture == NULL) {
     SDL_Log("Failed to create texture: %s", SDL_GetError());
@@ -72,7 +79,7 @@ int main() {
         x += dx;
         y += dy;
 
-        if ( x <= 0 || x + 250 >= 800 ) {
+        if ( x <= 0 || x + logo_width >= window_width ) {
             dx = -dx;
             
         int color = rand() % num_colors;
@@ -86,7 +93,7 @@ int main() {
     }
         
 
-        if ( y <= 0 || y + 117 >= 600 ) {
+        if ( y <= 0 || y + logo_heght >= window_heght ) {
             dy = -dy;
 
         int color = rand() % num_colors;
@@ -103,7 +110,7 @@ int main() {
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
-        SDL_FRect dst = { x, y, 250, 117 };
+        SDL_FRect dst = { x, y, (float)logo_width,(float)logo_heght };
 
         SDL_RenderTexture(renderer, texture, NULL, &dst);
 
